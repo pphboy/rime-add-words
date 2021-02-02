@@ -1,0 +1,82 @@
+<template>
+  <el-card shadow="false">
+    <a-row>
+      <a-col :span="24">
+        <el-input v-model="filePath"  placeholder="请输入RIME词库路径" />
+         <el-button @click="saveFilePath(filePath)">保存</el-button>
+      </a-col>
+    </a-row>
+  </el-card>
+  <br><br>
+  <el-card shadow="false">
+    <a-row>
+      <a-col :span="24">
+        词条: <el-input v-model="word" style="width:150px;" placeholder="输入词条" />
+        编码: <el-input v-model="code" style="width:150px;" placeholder="输入编码" />
+          <el-button type="primary" style="margin-left:20px;" @click="save">添加</el-button>
+      </a-col>
+    </a-row>
+  </el-card>
+</template>
+
+
+
+<script lang="ts">
+import fs from 'fs';
+import { reactive, computed, getCurrentInstance } from 'vue'
+import main from '/@/utils/main.ts';
+const version = require('process').versions.electron
+
+// clear test
+
+export default {
+  name: 'Index',
+  components: {
+  },
+  setup() {
+    const {ctx} = getCurrentInstance();
+    const data:any = reactive({
+      filePath:null,
+      word:null,
+      code:null,
+    })
+
+    let file = main.local.get("file");
+    file = file?file:{};
+    if(!file.path){
+      ctx.$message.warning("请设置文件路径路径");
+    }else{
+      data.filePath = main.local.get("file").path;
+    }
+    //test
+    return data;
+  },
+  methods:{
+    saveFilePath(filePath:string){
+      console.log(filePath);
+      main.local.set("file",{path:filePath});
+    },
+    save(){
+      var vm = this;
+      const test = "123 123";
+      fs.appendFile(vm.filePath,test, err => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        //完成！
+      })
+      //清除输入框
+      this.reset();
+    },
+    reset(){
+      this.word = null;
+      this.code = null;
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+</style>
+
